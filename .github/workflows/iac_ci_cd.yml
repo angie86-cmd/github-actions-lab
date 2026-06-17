@@ -1,15 +1,10 @@
 # Simple CI/CD pipeline for a fictitious Node.js web application
 name: Web Application CI/CD Pipeline
 
-# The pipeline runs whenever code is pushed to the main branch
-# or when a pull request targets the main branch.
+# Defines when the GitHub Actions workflow can be started
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+  # Allows the workflow to be triggered manually from the GitHub Actions UI
+  workflow_dispatch:
 
 jobs:
   # Job 1: Build and test the application

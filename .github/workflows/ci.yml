@@ -1,14 +1,10 @@
 # Name of the workflow shown in the GitHub Actions tab
 name: CI/CD Pipeline
 
-# Trigger the workflow on pushes to main and pull requests targeting main
+# Defines when the GitHub Actions workflow can be started
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+  # Allows the workflow to be triggered manually from the GitHub Actions UI
+  workflow_dispatch:
 
 # Pipeline jobs
 jobs:
