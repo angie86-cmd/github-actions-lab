@@ -1,0 +1,101 @@
+# CI/CD pipeline for a fictitious Node.js web application
+# This workflow illustrates the main DevOps steps:
+# checkout, test, Docker image build, registry upload, Terraform deployment,
+# and Slack notification.
+
+name: CI/CD Pipeline with Terraform
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step A: Checkout the source code from the Git repository.
+      # This allows the pipeline to access the application code,
+      # Dockerfile, Terraform files and deployment scripts.
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      # Step B: Set up Node.js.
+      # A real Node.js project would contain package.json with scripts
+      # such as "test" and "build".
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # Step C: Run unit tests.
+      # In a real project this would be: npm install && npm test.
+      # Here it is simulated because this repository does not contain
+      # a complete Node.js application.
+      - name: Run unit tests
+        run: |
+          echo "Installing dependencies..."
+          echo "npm install"
+          echo "Running unit tests..."
+          echo "npm test"
+          echo "Unit tests completed successfully."
+
+      # Step D: Build a Docker image.
+      # In a real project this would require a Dockerfile.
+      # Example real command:
+      # docker build -t ghcr.io/<user>/<image-name>:${{ github.sha }} .
+      - name: Build Docker image
+        run: |
+          echo "Building Docker image..."
+          echo "docker build -t fictitious-webapp:${{ github.sha }} ."
+          echo "Docker image build simulated successfully."
+
+      # Step E: Upload the Docker image to a Docker registry.
+      # In a real project this step would require registry credentials
+      # stored as GitHub Secrets, for example DOCKER_USERNAME and DOCKER_PASSWORD.
+      - name: Push Docker image to registry
+        run: |
+          echo "Logging in to Docker registry..."
+          echo "docker login -u <username> --password-stdin"
+          echo "Pushing Docker image..."
+          echo "docker push fictitious-webapp:${{ github.sha }}"
+          echo "Docker image push simulated successfully."
+
+      # Step F: Install Terraform.
+      # Terraform would be used to provision or update the test environment.
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: latest
+
+      # Step G: Deploy to a test server using Terraform.
+      # In a real project this would execute:
+      # terraform init
+      # terraform plan
+      # terraform apply -auto-approve
+      #
+      # Here the commands are shown as simulation because no real cloud credentials,
+      # backend or test server are configured in this learning repository.
+      - name: Deploy to test server with Terraform
+        run: |
+          echo "Initializing Terraform..."
+          echo "terraform init"
+          echo "Planning Terraform changes..."
+          echo "terraform plan"
+          echo "Applying Terraform configuration..."
+          echo "terraform apply -auto-approve"
+          echo "Terraform deployment simulated successfully."
+
+      # Step H: Send a Slack notification.
+      # In a real project this could use a Slack webhook stored as a GitHub Secret.
+      # Example secret: SLACK_WEBHOOK_URL.
+      - name: Send Slack notification
+        if: always()
+        run: |
+          echo "Sending Slack notification..."
+          echo "Workflow status: ${{ job.status }}"
+          echo "Slack notification simulated."
