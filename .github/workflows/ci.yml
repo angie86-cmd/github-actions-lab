@@ -1,0 +1,54 @@
+# Name of the workflow shown in the GitHub Actions tab
+name: CI/CD Pipeline
+
+# Trigger the workflow on pushes to main and pull requests targeting main
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+# Pipeline jobs
+jobs:
+  # Build phase: install dependencies and build the application
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build application
+        run: npm run build
+
+  # Test phase: runs only if the build job succeeds
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run automated tests
+        run: npm test
+
+  # Deploy phase: runs only if the test job succeeds
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Simulate deployment
+        run: ./deploy.sh
