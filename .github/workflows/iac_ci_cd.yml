@@ -1,0 +1,70 @@
+# Simple CI/CD pipeline for a fictitious Node.js web application
+name: Web Application CI/CD Pipeline
+
+# The pipeline runs whenever code is pushed to the main branch
+# or when a pull request targets the main branch.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  # Job 1: Build and test the application
+  build_and_test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step A: Checkout the source code from the Git repository.
+      # This is required so that the pipeline can access the application code.
+      - name: Checkout source code
+        uses: actions/checkout@v2
+
+      # Set up Node.js for the web application.
+      # A real Node.js project would define dependencies and scripts in package.json.
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "20"
+
+      # Step B: Install dependencies.
+      # This prepares the application for testing and building.
+      - name: Install dependencies
+        run: npm install
+
+      # Step C: Run unit tests.
+      # Unit tests help detect errors early before creating or deploying a container.
+      - name: Run unit tests
+        run: npm test
+
+      # Step D: Build the Docker container image.
+      # The image packages the web application together with its runtime environment.
+      - name: Build Docker image
+        run: docker build -t fictitious-webapp:${{ github.sha }} .
+
+  # Job 2: Deploy the container to a test server
+  deploy_to_test:
+    runs-on: ubuntu-latest
+    needs: build_and_test
+
+    steps:
+      # Checkout is needed again because each job runs in a fresh runner environment.
+      - name: Checkout source code
+        uses: actions/checkout@v2
+
+      # In a real project, this step would push the image to a container registry
+      # and deploy it to a test server, Kubernetes cluster, or cloud environment.
+      # Here, the deployment is simulated for learning purposes.
+      - name: Deploy container to test server
+        run: |
+          echo "Deploying Docker container to test server..."
+          echo "docker run -d -p 8080:80 fictitious-webapp:${{ github.sha }}"
+          echo "Deployment to test server completed successfully."
+
+      # Step E: Send a deployment notification.
+      # In a real setup, this could call Slack, Microsoft Teams, email, or another notification service.
+      - name: Send deployment notification
+        run: |
+          echo "Notification: Deployment of fictitious-webapp was successful."
