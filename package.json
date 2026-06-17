@@ -1,0 +1,19 @@
+{
+  "name": "github-actions-lab-webapp",
+  "version": "1.0.0",
+  "description": "Minimal Node.js web application for GitHub Actions CI/CD exercises",
+  "main": "app.js",
+  "scripts": {
+    "test": "node test.js",
+    "start": "node app.js"
+  },
+  "keywords": [
+    "github-actions",
+    "ci-cd",
+    "docker",
+    "nodejs",
+    "devops"
+  ],
+  "author": "Angie Angarita Soto",
+  "license": "MIT"
+}

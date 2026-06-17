@@ -1,0 +1,60 @@
+# CI/CD pipeline for a minimal Node.js web application.
+# This workflow builds a Docker image, runs unit tests inside the container,
+# simulates deployment to a test server, and simulates an email notification.
+
+name: WebApp Docker CI/CD with Email Notification
+
+# The workflow runs automatically on pushes to the main branch.
+# It can also be triggered manually from the GitHub Actions UI.
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-test-deploy:
+    # Use the latest Ubuntu runner provided by GitHub.
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step A: Checkout code from the Git repository.
+      # This gives the runner access to the application code, Dockerfile,
+      # test script and workflow configuration.
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      # Step B: Build the Docker image.
+      # The Docker image packages the application together with its runtime environment.
+      # This helps ensure consistent execution across different systems.
+      - name: Build Docker image
+        run: docker build -t webapp:${{ github.sha }} .
+
+      # Step C: Run unit tests inside the Docker container.
+      # This validates the application before deployment.
+      # Running tests inside the container also checks that the image contains
+      # everything required to execute the application.
+      - name: Run unit tests
+        run: docker run --rm webapp:${{ github.sha }} npm test
+
+      # Step D: Simulate deployment to a test server.
+      # In a real project, this step could push the Docker image to a registry
+      # and deploy it to a test server, Kubernetes cluster, or cloud environment.
+      - name: Deploy Docker image to test server
+        run: |
+          echo "Deploying Docker image webapp:${{ github.sha }} to test server..."
+          echo "docker run -d -p 3000:3000 webapp:${{ github.sha }}"
+          echo "Deployment simulation completed successfully."
+
+      # Step E: Simulate email notification.
+      # In a real project, this could use an SMTP action and GitHub Secrets,
+      # for example EMAIL_USERNAME, EMAIL_PASSWORD and SMTP_SERVER.
+      # The notification informs the team about the deployment result.
+      - name: Send email notification
+        if: success()
+        run: |
+          echo "Sending email notification..."
+          echo "To: dev-team@example.com"
+          echo "Subject: Successful deployment of web application"
+          echo "Body: The web application was successfully built, tested and deployed to the test server."
+          echo "Email notification simulation completed."
