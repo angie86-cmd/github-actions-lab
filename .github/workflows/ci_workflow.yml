@@ -1,13 +1,10 @@
 # Workflow name displayed in the GitHub Actions tab
 name: Node.js CI Workflow
 
-# Events that trigger the workflow
+# Defines when the GitHub Actions workflow can be started
 on:
-  # Run the workflow whenever code is pushed to the repository
-  push:
-
-  # Run the workflow whenever a pull request is opened or updated
-  pull_request:
+  # Allows the workflow to be triggered manually from the GitHub Actions UI
+  workflow_dispatch:
 
 # Jobs define what the workflow will execute
 jobs:
@@ -20,11 +17,11 @@ jobs:
     steps:
       # Checkout the repository code into the runner
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       # Install and configure Node.js
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           # Node.js version used for this workflow
           node-version: "20"
