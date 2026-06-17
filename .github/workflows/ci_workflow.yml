@@ -1,0 +1,52 @@
+# Workflow name displayed in the GitHub Actions tab
+name: Node.js CI Workflow
+
+# Events that trigger the workflow
+on:
+  # Run the workflow whenever code is pushed to the repository
+  push:
+
+  # Run the workflow whenever a pull request is opened or updated
+  pull_request:
+
+# Jobs define what the workflow will execute
+jobs:
+  # Name of the job
+  build:
+    # Use the latest Ubuntu runner provided by GitHub
+    runs-on: ubuntu-latest
+
+    # Steps are executed sequentially
+    steps:
+      # Checkout the repository code into the runner
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Install and configure Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          # Node.js version used for this workflow
+          node-version: "20"
+
+      # Install project dependencies from package.json
+      - name: Install dependencies
+        run: npm install
+
+      # Run automated tests
+      - name: Run tests
+        run: npm test
+
+      # Build the application for production
+      - name: Build project
+        run: npm run build
+
+      # Store the build output as a downloadable artifact
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          # Artifact name in GitHub Actions
+          name: build
+
+          # Directory containing the production-ready files
+          path: build/
