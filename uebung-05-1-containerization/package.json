@@ -1,0 +1,19 @@
+{
+  "name": "uebung-05-1-containerization-webapp",
+  "version": "1.0.0",
+  "description": "Minimal Hello World web application for DevOps Foundation Übung 05.1.Ü.01",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "node test.js"
+  },
+  "keywords": [
+    "github-actions",
+    "docker",
+    "containerization",
+    "ci-cd",
+    "integration-test"
+  ],
+  "author": "Angie Angarita Soto",
+  "license": "MIT"
+}
