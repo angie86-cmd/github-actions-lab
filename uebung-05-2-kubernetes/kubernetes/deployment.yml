@@ -1,0 +1,48 @@
+# Kubernetes Deployment for the Hello World web application.
+# A Deployment defines the desired state for application Pods and
+# allows Kubernetes to create, update, scale, and replace them automatically.
+
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  # Name of the Deployment resource.
+  name: uebung-05-2-webapp-deployment
+
+  # Labels help identify and group related Kubernetes resources.
+  labels:
+    app: uebung-05-2-webapp
+
+spec:
+  # Run two replicas of the application for basic availability.
+  replicas: 2
+
+  # Selector used by the Deployment to identify the Pods it manages.
+  selector:
+    matchLabels:
+      app: uebung-05-2-webapp
+
+  # Pod template used by the Deployment to create new Pods.
+  template:
+    metadata:
+      # Labels assigned to the Pods created by this Deployment.
+      labels:
+        app: uebung-05-2-webapp
+
+    spec:
+      containers:
+        # Container running the Hello World web application.
+        - name: webapp
+
+          # Docker image used by Kubernetes.
+          # For a local test environment, this image can be built locally.
+          # In a real CI/CD pipeline, this would usually point to a container registry.
+          image: uebung-05-2-webapp:local
+
+          # Prevent Kubernetes from trying to pull this local image from an external registry.
+          # This is useful for local Docker Desktop or Minikube testing.
+          imagePullPolicy: Never
+
+          # Port exposed by the container inside the Pod.
+          ports:
+            - containerPort: 3000

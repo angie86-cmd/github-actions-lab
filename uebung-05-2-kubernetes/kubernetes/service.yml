@@ -1,0 +1,32 @@
+# Kubernetes Service for the Hello World web application.
+# A Service provides a stable network endpoint for a set of Pods.
+# This is important because Pods are temporary and can be recreated with new IP addresses.
+
+apiVersion: v1
+kind: Service
+
+metadata:
+  # Name of the Service resource.
+  name: uebung-05-2-webapp-service
+
+spec:
+  # NodePort exposes the application on a fixed port of the Kubernetes node.
+  # This is useful for simple local test scenarios.
+  type: NodePort
+
+  # Selects the Pods that belong to this Service.
+  # The selector must match the labels defined in the Deployment.
+  selector:
+    app: uebung-05-2-webapp
+
+  ports:
+    # Expose the Service on port 80 inside the cluster.
+    - protocol: TCP
+      port: 80
+
+      # Forward traffic to port 3000 inside the application container.
+      targetPort: 3000
+
+      # Expose the application externally through this NodePort.
+      # In local setups, the application can be reached through this port.
+      nodePort: 30080
