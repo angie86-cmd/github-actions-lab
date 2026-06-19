@@ -1,0 +1,126 @@
+# CI/CD pipeline for Übung 05.1.Ü.01 - Containerization.
+# This workflow builds a Docker image, pushes it to GitHub Container Registry,
+# deploys it as a test container on the GitHub Actions runner,
+# and executes an integration test against the running application.
+
+name: Containerization CI/CD Pipeline
+
+# The workflow runs on pushes to main and can also be started manually.
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+# Required permissions for pushing Docker images to GitHub Container Registry.
+permissions:
+  contents: read
+  packages: write
+
+# Global environment variables used across jobs.
+env:
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/github-actions-lab-webapp
+
+jobs:
+  build-and-push:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step A: Checkout the repository.
+      # This gives the workflow access to the application source code and Dockerfile.
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      # Step B: Set up Docker Buildx.
+      # Buildx provides an extended Docker build environment used in modern CI/CD pipelines.
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Step C: Login to GitHub Container Registry.
+      # The GITHUB_TOKEN is automatically provided by GitHub Actions.
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step D: Build and push the Docker image.
+      # The image is tagged with both the commit SHA and "latest".
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./uebung-05-1-containerization
+          file: ./uebung-05-1-containerization/Dockerfile
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.IMAGE_NAME }}:latest
+
+  deploy-and-test:
+    name: Deploy and Run Integration Tests
+    runs-on: ubuntu-latest
+    needs: build-and-push
+
+    steps:
+      # Step A: Login to GitHub Container Registry.
+      # This is required so the runner can pull the image pushed by the previous job.
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step B: Pull the Docker image from GitHub Container Registry.
+      # This simulates how a test server would obtain the released image.
+      - name: Pull Docker image
+        run: docker pull ${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+      # Step C: Deploy the Docker image on the test server.
+      # In this exercise, the GitHub Actions runner acts as a temporary test server.
+      - name: Deploy Docker image on test server
+        run: |
+          docker run -d \
+            --name uebung-05-1-webapp-test \
+            -p 3000:3000 \
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+      # Step D: Wait until the application is ready.
+      # This gives the container a few seconds to start before the integration test runs.
+      - name: Wait for application startup
+        run: sleep 5
+
+      # Step E: Show running containers.
+      # This documents that the application container is running.
+      - name: Show running containers
+        run: docker ps
+
+      # Step F: Run integration test against the deployed application.
+      # The test verifies that the application responds successfully over HTTP.
+      - name: Run integration test
+        run: |
+          response=$(curl -s http://localhost:3000)
+          echo "Application response: $response"
+
+          if echo "$response" | grep -q "Hello World"; then
+            echo "Integration test passed."
+          else
+            echo "Integration test failed."
+            exit 1
+          fi
+
+      # Step G: Print container logs for traceability.
+      # This helps debugging if the deployment or integration test fails.
+      - name: Show container logs
+        if: always()
+        run: docker logs uebung-05-1-webapp-test
+
+      # Step H: Stop and remove the test container.
+      # This cleans up the temporary test environment.
+      - name: Clean up test container
+        if: always()
+        run: |
+          docker stop uebung-05-1-webapp-test || true
+          docker rm uebung-05-1-webapp-test || true
